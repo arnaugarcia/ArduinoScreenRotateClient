@@ -13,7 +13,6 @@
 // kIOFBSetTransform comes from <IOKit/graphics/IOGraphicsTypesPrivate.h>
 // in the source for the IOGraphics family
 
-
 enum {
     kIOFBSetTransform = 0x00000400,
 };
