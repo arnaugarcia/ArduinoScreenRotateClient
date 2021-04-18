@@ -18,30 +18,26 @@ enum {
     kIOFBSetTransform = 0x00000400,
 };
 
-void
-usage(void)
-{
+void usage() {
     fprintf(stderr, "usage: %s -l\n"
                     "       %s -i\n"
                     "       %s -d <display ID> -m\n"
                     "       %s -d <display ID> -r <0|90|180|270|1>\n"
-	            "\n"
-	            "-r 1 signfies 90 if currently not rotated; otherwise 0 (i.e. toggle)\n"
-	            "\n"
-	            "-d -1 can be used for the <display ID> of the internal monitor\n"
-	            "-d 0  can be used for the <display ID> of the main monitor\n"
-	            "-d 1  can be used for the <display ID> of the first non-internal monitor\n",
-                    PROGNAME, PROGNAME, PROGNAME, PROGNAME);
+                    "\n"
+                    "-r 1 signfies 90 if currently not rotated; otherwise 0 (i.e. toggle)\n"
+                    "\n"
+                    "-d -1 can be used for the <display ID> of the internal monitor\n"
+                    "-d 0  can be used for the <display ID> of the main monitor\n"
+                    "-d 1  can be used for the <display ID> of the first non-internal monitor\n",
+            PROGNAME, PROGNAME, PROGNAME, PROGNAME);
     exit(1);
 }
 
-void
-listDisplays(void)
-{
-   CGDisplayErr      dErr;
-    CGDisplayCount    displayCount, i;
+void listDisplays() {
+    CGDisplayErr dErr;
+    CGDisplayCount displayCount, i;
     CGDirectDisplayID mainDisplay;
-    CGDisplayCount    maxDisplays = MAX_DISPLAYS;
+    CGDisplayCount maxDisplays = MAX_DISPLAYS;
     CGDirectDisplayID onlineDisplays[MAX_DISPLAYS];
 
     mainDisplay = CGMainDisplayID();
@@ -63,13 +59,11 @@ listDisplays(void)
     exit(0);
 }
 
-void
-infoDisplays(void)
-{
-    CGDisplayErr      dErr;
-    CGDisplayCount    displayCount, i;
+void infoDisplays() {
+    CGDisplayErr dErr;
+    CGDisplayCount displayCount, i;
     CGDirectDisplayID mainDisplay;
-    CGDisplayCount    maxDisplays = MAX_DISPLAYS;
+    CGDisplayCount maxDisplays = MAX_DISPLAYS;
     CGDirectDisplayID onlineDisplays[MAX_DISPLAYS];
 
     CGEventRef ourEvent = CGEventCreate(NULL);
@@ -89,40 +83,38 @@ infoDisplays(void)
     for (i = 0; i < displayCount; i++) {
         CGDirectDisplayID dID = onlineDisplays[i];
         printf("%-2d 0x%-10x  %4lux%-4lu  %5.0f %5.0f %5.0f %5.0f    %3.0f    %s%s%s",
-               CGDisplayUnitNumber (dID), dID,
+               CGDisplayUnitNumber(dID), dID,
                CGDisplayPixelsWide(dID), CGDisplayPixelsHigh(dID),
-               CGRectGetMinX (CGDisplayBounds (dID)),
-               CGRectGetMinY (CGDisplayBounds (dID)),
-               CGRectGetMaxX (CGDisplayBounds (dID)),
-               CGRectGetMaxY (CGDisplayBounds (dID)),
-               CGDisplayRotation (dID),
-               (CGDisplayIsActive (dID)) ? "" : "[inactive]",
+               CGRectGetMinX(CGDisplayBounds(dID)),
+               CGRectGetMinY(CGDisplayBounds(dID)),
+               CGRectGetMaxX(CGDisplayBounds(dID)),
+               CGRectGetMaxY(CGDisplayBounds(dID)),
+               CGDisplayRotation(dID),
+               (CGDisplayIsActive(dID)) ? "" : "[inactive]",
                (dID == mainDisplay) ? "[main]" : "",
-               (CGDisplayIsBuiltin (dID)) ? "[internal]\n" : "\n");
+               (CGDisplayIsBuiltin(dID)) ? "[internal]\n" : "\n");
     }
 
     printf("Mouse Cursor Position:  ( %5.0f , %5.0f )\n",
-               (float)ourLoc.x, (float)ourLoc.y);
+           (float) ourLoc.x, (float) ourLoc.y);
 
     exit(0);
 }
 
-void
-setMainDisplay(CGDirectDisplayID targetDisplay)
-{
-    int				   deltaX, deltaY, flag;
-    CGDisplayErr       dErr;
-    CGDisplayCount     displayCount, i;
+void setMainDisplay(CGDirectDisplayID targetDisplay) {
+    int deltaX, deltaY, flag;
+    CGDisplayErr dErr;
+    CGDisplayCount displayCount, i;
     CGDirectDisplayID mainDisplay;
-    CGDisplayCount     maxDisplays = MAX_DISPLAYS;
-    CGDirectDisplayID  onlineDisplays[MAX_DISPLAYS];
-	CGDisplayConfigRef config;
+    CGDisplayCount maxDisplays = MAX_DISPLAYS;
+    CGDirectDisplayID onlineDisplays[MAX_DISPLAYS];
+    CGDisplayConfigRef config;
 
-	mainDisplay = CGMainDisplayID();
+    mainDisplay = CGMainDisplayID();
 
-	if (mainDisplay == targetDisplay) {
-	exit(0);
-	}
+    if (mainDisplay == targetDisplay) {
+        exit(0);
+    }
 
     dErr = CGGetOnlineDisplayList(maxDisplays, onlineDisplays, &displayCount);
     if (dErr != kCGErrorSuccess) {
@@ -130,30 +122,30 @@ setMainDisplay(CGDirectDisplayID targetDisplay)
         exit(1);
     }
 
-	flag = 0;
+    flag = 0;
     for (i = 0; i < displayCount; i++) {
-    	CGDirectDisplayID dID = onlineDisplays[i];
-			if (dID == targetDisplay) { flag = 1; }
-	}
-	if (flag == 0) {
+        CGDirectDisplayID dID = onlineDisplays[i];
+        if (dID == targetDisplay) { flag = 1; }
+    }
+    if (flag == 0) {
         fprintf(stderr, "No such display ID: 0x%-10x.\n", targetDisplay);
         exit(1);
     }
 
-	deltaX = -CGRectGetMinX (CGDisplayBounds (targetDisplay));
-    deltaY = -CGRectGetMinY (CGDisplayBounds (targetDisplay));
+    deltaX = -CGRectGetMinX(CGDisplayBounds(targetDisplay));
+    deltaY = -CGRectGetMinY(CGDisplayBounds(targetDisplay));
 
-    CGBeginDisplayConfiguration (&config);
+    CGBeginDisplayConfiguration(&config);
 
     for (i = 0; i < displayCount; i++) {
         CGDirectDisplayID dID = onlineDisplays[i];
 
-    CGConfigureDisplayOrigin (config, dID,
-    	CGRectGetMinX (CGDisplayBounds (dID)) + deltaX,
-    	CGRectGetMinY (CGDisplayBounds (dID)) + deltaY );
-	}
+        CGConfigureDisplayOrigin(config, dID,
+                                 CGRectGetMinX(CGDisplayBounds(dID)) + deltaX,
+                                 CGRectGetMinY(CGDisplayBounds(dID)) + deltaY);
+    }
 
-    CGCompleteDisplayConfiguration (config, kCGConfigureForSession);
+    CGCompleteDisplayConfiguration(config, kCGConfigureForSession);
 
 
     exit(0);
@@ -162,10 +154,10 @@ setMainDisplay(CGDirectDisplayID targetDisplay)
 
 CGDirectDisplayID
 InternalID(void) {
-   // returns the ID of the internal monitor;
-    CGDisplayErr      dErr;
-    CGDisplayCount    displayCount, i;
-    CGDisplayCount    maxDisplays = MAX_DISPLAYS;
+    // returns the ID of the internal monitor;
+    CGDisplayErr dErr;
+    CGDisplayCount displayCount, i;
+    CGDisplayCount maxDisplays = MAX_DISPLAYS;
     CGDirectDisplayID onlineDisplays[MAX_DISPLAYS];
     CGDirectDisplayID fallbackID = 0;
     dErr = CGGetOnlineDisplayList(maxDisplays, onlineDisplays, &displayCount);
@@ -175,20 +167,19 @@ InternalID(void) {
     }
     for (i = 0; i < displayCount; i++) {
         CGDirectDisplayID dID = onlineDisplays[i];
-	if ((CGDisplayIsBuiltin (dID))) {
-	  return dID;
-	}
+        if ((CGDisplayIsBuiltin(dID))) {
+            return dID;
+        }
     }
     return fallbackID;
 }
 
 
-CGDirectDisplayID
-nonInternalID(void) {
-   // returns the ID of the first active monitor that is not internal or 0 if only one monitor;
-    CGDisplayErr      dErr;
-    CGDisplayCount    displayCount, i;
-    CGDisplayCount    maxDisplays = MAX_DISPLAYS;
+CGDirectDisplayID nonInternalID() {
+    // returns the ID of the first active monitor that is not internal or 0 if only one monitor;
+    CGDisplayErr dErr;
+    CGDisplayCount displayCount, i;
+    CGDisplayCount maxDisplays = MAX_DISPLAYS;
     CGDirectDisplayID onlineDisplays[MAX_DISPLAYS];
     CGDirectDisplayID fallbackID = 0;
     dErr = CGGetOnlineDisplayList(maxDisplays, onlineDisplays, &displayCount);
@@ -198,21 +189,19 @@ nonInternalID(void) {
     }
     for (i = 0; i < displayCount; i++) {
         CGDirectDisplayID dID = onlineDisplays[i];
-	if (!(CGDisplayIsBuiltin (dID)) && (CGDisplayIsActive (dID))) {
-	  return dID;
-	}
+        if (!(CGDisplayIsBuiltin(dID)) && (CGDisplayIsActive(dID))) {
+            return dID;
+        }
     }
     return fallbackID;
 }
 
 
-
 CGDirectDisplayID
-cgIDfromU32(uint32_t preId)
-{
-    CGDisplayErr      dErr;
-    CGDisplayCount    displayCount, i;
-    CGDisplayCount    maxDisplays = MAX_DISPLAYS;
+cgIDfromU32(uint32_t preId) {
+    CGDisplayErr dErr;
+    CGDisplayCount displayCount, i;
+    CGDisplayCount maxDisplays = MAX_DISPLAYS;
     CGDirectDisplayID onlineDisplays[MAX_DISPLAYS];
     CGDirectDisplayID postId = preId;
 
@@ -233,14 +222,13 @@ cgIDfromU32(uint32_t preId)
 }
 
 IOOptionBits
-angle2options(long angle)
-{
+angle2options(long angle) {
     static IOOptionBits anglebits[] = {
-               (kIOFBSetTransform | (kIOScaleRotate0)   << 16),
-               (kIOFBSetTransform | (kIOScaleRotate90)  << 16),
-               (kIOFBSetTransform | (kIOScaleRotate180) << 16),
-               (kIOFBSetTransform | (kIOScaleRotate270) << 16)
-           };
+            (kIOFBSetTransform | (kIOScaleRotate0) << 16),
+            (kIOFBSetTransform | (kIOScaleRotate90) << 16),
+            (kIOFBSetTransform | (kIOScaleRotate180) << 16),
+            (kIOFBSetTransform | (kIOScaleRotate270) << 16)
+    };
 
     if ((angle % 90) != 0) // Map arbitrary angles to a rotation reset
         return anglebits[0];
@@ -249,47 +237,46 @@ angle2options(long angle)
 }
 
 int
-main(int argc, char **argv)
-{
-    int  i;
+main(int argc, char **argv) {
+    int i;
     long angle = 0;
     long currentRotation = 0;
 
-    io_service_t      service;
-    int      dErr;
+    io_service_t service;
+    int dErr;
     CGDirectDisplayID targetDisplay = 0;
-    IOOptionBits      options;
+    IOOptionBits options;
 
     while ((i = getopt(argc, argv, "d:limr:")) != -1) {
         switch (i) {
-        case 'd':
-            targetDisplay = (CGDirectDisplayID)strtoul(optarg, NULL, 16);
-            if (targetDisplay == -1)
-                targetDisplay = InternalID();
-            if (targetDisplay == 0)
-                targetDisplay = CGMainDisplayID();
-            if (targetDisplay == 1) {
-                targetDisplay = nonInternalID();
-                if (targetDisplay == 0) {
-                  fprintf(stderr, "Could not find an active monitor besides the internal one.\n");
-                  exit(1);
-		      }
-            }
-            break;
-        case 'l':
-            listDisplays();
-            break;
-        case 'i':
-            infoDisplays();
-            break;
-        case 'm':
-            setMainDisplay(targetDisplay);
-            break;
-        case 'r':
-            angle = strtol(optarg, NULL, 10);
-            break;
-        default:
-            break;
+            case 'd':
+                targetDisplay = (CGDirectDisplayID) strtoul(optarg, NULL, 16);
+                if (targetDisplay == -1)
+                    targetDisplay = InternalID();
+                if (targetDisplay == 0)
+                    targetDisplay = CGMainDisplayID();
+                if (targetDisplay == 1) {
+                    targetDisplay = nonInternalID();
+                    if (targetDisplay == 0) {
+                        fprintf(stderr, "Could not find an active monitor besides the internal one.\n");
+                        exit(1);
+                    }
+                }
+                break;
+            case 'l':
+                listDisplays();
+                break;
+            case 'i':
+                infoDisplays();
+                break;
+            case 'm':
+                setMainDisplay(targetDisplay);
+                break;
+            case 'r':
+                angle = strtol(optarg, NULL, 10);
+                break;
+            default:
+                break;
         }
     }
 
@@ -297,12 +284,12 @@ main(int argc, char **argv)
         usage();
 
     if (angle == 1) {
-        currentRotation = CGDisplayRotation (targetDisplay);
+        currentRotation = CGDisplayRotation(targetDisplay);
         if (currentRotation == 0) {
-	  angle = 90;
-	} else {
-          angle = 0;
-	}
+            angle = 90;
+        } else {
+            angle = 0;
+        }
     }
 
     options = angle2options(angle);
@@ -321,8 +308,8 @@ main(int argc, char **argv)
     dErr = IOServiceRequestProbe(service, options);
     if (dErr != kCGErrorSuccess) {
         fprintf(stderr, "IOServiceRequestProbe: error %d\n", dErr);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
