@@ -152,8 +152,7 @@ void setMainDisplay(CGDirectDisplayID targetDisplay) {
 }
 
 
-CGDirectDisplayID
-InternalID(void) {
+CGDirectDisplayID InternalID() {
     // returns the ID of the internal monitor;
     CGDisplayErr dErr;
     CGDisplayCount displayCount, i;
@@ -197,8 +196,7 @@ CGDirectDisplayID nonInternalID() {
 }
 
 
-CGDirectDisplayID
-cgIDfromU32(uint32_t preId) {
+CGDirectDisplayID cgIDfromU32(uint32_t preId) {
     CGDisplayErr dErr;
     CGDisplayCount displayCount, i;
     CGDisplayCount maxDisplays = MAX_DISPLAYS;
@@ -221,8 +219,7 @@ cgIDfromU32(uint32_t preId) {
     exit(1);
 }
 
-IOOptionBits
-angle2options(long angle) {
+IOOptionBits angle2options(long angle) {
     static IOOptionBits anglebits[] = {
             (kIOFBSetTransform | (kIOScaleRotate0) << 16),
             (kIOFBSetTransform | (kIOScaleRotate90) << 16),
@@ -236,8 +233,7 @@ angle2options(long angle) {
     return anglebits[(angle / 90) % 4];
 }
 
-int
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
     int i;
     long angle = 0;
     long currentRotation = 0;
